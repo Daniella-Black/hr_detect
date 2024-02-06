@@ -51,7 +51,7 @@ names(cnvs) <- sample
 ####################################################################
 res <- HRDetect_pipeline(input_matrix,
                          genome.v = genomev,
-                         Indels_tab_files = indeltab,
+                         Indels_vcf_files = indeltab,
                          CNV_tab_files = cnvs)
 
 df <- as.data.frame(res$hrdetect_output)
