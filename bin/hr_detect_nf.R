@@ -4,10 +4,10 @@ library(signature.tools.lib)
 args = commandArgs(trailingOnly=TRUE)
 
 sample <- args[1]
-snvcat_path <- args[2]
-svcat_path <- args[3]
+snvexp_path <- args[2]
+svexp_path <- args[3]
 cnv_path <- args[4]
-indel_highspecific_path <- args[5]
+indel_path <- args[5]
 
 genomev = 'hg38'
 ##make the empty input matrix
@@ -16,27 +16,28 @@ input_matrix <- matrix(NA,nrow = 1,ncol = length(col_hrdetect),dimnames = list(s
 ####################################################################
 ####indels##########################################################
 ####################################################################
-indeltab <- c(indel_highspecific_path)
+indeltab <- c(indel_path)
 names(indeltab) <- sample
 ####################################################################
 ####snvs############################################################
 ####################################################################
 
 #snv catalogues
-snvcat = read.csv(snvcat_path)
-rownames(snvcat) <- snvcat$X 
-snvcat$X <- NULL
-names(snvcat)[1] <- sample
-
+snv_full <- read.csv(snvexp_path)
+snv <- subset(snv_full, sample==sample)
+rownames(snv) <- 1:length(rownames(snv))
+input_matrix[sample, 'SNV3'] <- sv[1, 'SNV3']
+input_matrix[sample, 'SNV8'] <- sv[1, 'SNV8']
 
 ####################################################################
 ####svs############################################################
 ####################################################################
-#rearrangements
-svcat <- read.csv(svcat_path)
-rownames(svcat) <- svcat$X 
-svcat$X <- NULL
-names(svcat)[1] <- sample
+sv_full <- read.csv(svexp_path)
+sv <- subset(sv_full, sample==sample)
+rownames(sv) <- 1:length(rownames(sv))
+input_matrix[sample, 'SV3'] <- sv[1, 'SV3']
+input_matrix[sample, 'SV5'] <- sv[1, 'SV5']
+
 
 ####################################################################
 ####cnvs############################################################
@@ -45,23 +46,13 @@ names(svcat)[1] <- sample
 cnvs <- c(cnv_path)
 names(cnvs) <- sample
 
-
-
+####################################################################
+####run HRDetect####################################################
+####################################################################
 res <- HRDetect_pipeline(input_matrix,
                          genome.v = genomev,
-                         SNV_signature_version = "RefSigv2", 
-                         SV_catalogues = svcat,
                          Indels_tab_files = indeltab,
-                         CNV_tab_files = cnvs,
-                         SNV_catalogues = snvcat,
-                         organ = 'Breast',
-                         nparallel = 2,
-                         exposureFilterTypeFit = "fixedThreshold", 
-                         threshold_percentFit = 5,
-                         bootstrapSignatureFit = TRUE, 
-                         nbootFit = 200,
-                         threshold_p.valueFit = 0.05)
-                         #bootstrapHRDetectScores = TRUE)
+                         CNV_tab_files = cnvs)
 
 df <- as.data.frame(res$hrdetect_output)
 df['sample'] = sample
