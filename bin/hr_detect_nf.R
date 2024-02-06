@@ -26,8 +26,8 @@ names(indeltab) <- sample
 snv_full <- read.csv(snvexp_path)
 snv <- subset(snv_full, sample==sample)
 rownames(snv) <- 1:length(rownames(snv))
-input_matrix[sample, 'SNV3'] <- sv[1, 'SNV3']
-input_matrix[sample, 'SNV8'] <- sv[1, 'SNV8']
+input_matrix[sample, 'SNV3'] <- snv[1, 'SNV3']
+input_matrix[sample, 'SNV8'] <- snv[1, 'SNV8']
 
 ####################################################################
 ####svs############################################################
